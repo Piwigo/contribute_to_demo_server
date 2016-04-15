@@ -16,6 +16,7 @@ global $prefixeTable;
 
 define('CTDS_CONTRIB_TABLE', $prefixeTable.'contribs');
 define('CTDS_PATH' , PHPWG_PLUGINS_PATH.basename(dirname(__FILE__)).'/');
+define('CTDS_UUID_PATTERN', '/^[a-zA-Z0-9]{20,}$/');
 
 include_once(CTDS_PATH.'include/functions.inc.php');
 
@@ -93,4 +94,88 @@ function ctds_ws_add_methods($arr)
     null,
     array('admin_only'=>true)
     );
+}
+
+// +-----------------------------------------------------------------------+
+// | SECTION INIT                                                          |
+// +-----------------------------------------------------------------------+
+
+add_event_handler('loc_end_section_init', 'ctds_section_init');
+
+/* define page section from url */
+function ctds_section_init()
+{
+  global $tokens, $page, $conf, $user, $template;
+
+  if ($tokens[0] != 'contrib')
+  {
+    return;
+  }
+
+  if (!isset($tokens[1]))
+  {
+    die("missing uuid");
+  }
+
+  $uuid = $tokens[1];
+
+  if (!preg_match(CTDS_UUID_PATTERN, $uuid))
+  {
+    die("invalid uuid");
+  }
+
+  $query = '
+SELECT
+    image_idx
+  FROM '.CTDS_CONTRIB_TABLE.'
+  WHERE contrib_uuid = \''.$uuid.'\'
+;';
+  $contribs = query2array($query);
+  if (count($contribs) == 0)
+  {
+    die('unknown uuid');
+  }
+
+  $contrib = $contribs[0];
+
+  $query = '
+SELECT *
+  FROM '.IMAGES_TABLE.'
+  WHERE id = '.$contrib['image_idx'].'
+;';
+  $images = query2array($query);
+
+  if (count($images) == 0)
+  {
+    die('image no longer available');
+  }
+
+  $image = $images[0];
+
+  // find the first reachable category linked to the photo
+  $query = '
+SELECT
+    category_id
+  FROM '.IMAGE_CATEGORY_TABLE.'
+  WHERE image_id = '.$image['id'].'
+;';
+
+  $authorizeds = array_diff(
+    array_from_query($query, 'category_id'),
+    explode(',', calculate_permissions($user['id'], $user['status']))
+    );
+
+  foreach ($authorizeds as $category_id)
+  {
+    $url = make_picture_url(
+      array(
+        'image_id' => $image['id'],
+        'category' => get_cat_info($category_id),
+        )
+      );
+
+    redirect($url);
+  }
+
+  die("the image is not visible currently");
 }
