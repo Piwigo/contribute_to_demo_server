@@ -256,6 +256,55 @@ SELECT *
      );
 }
 
+function ctds_ws_photo_remove($params, &$service)
+{
+  global $conf;
+
+  // check the uuid
+  if (!preg_match(CTDS_UUID_PATTERN, $params['uuid']))
+  {
+    return new PwgError(WS_ERR_INVALID_PARAM, 'Invalid uuid');
+  }
+
+  // does the uuid exists?
+  $query = '
+SELECT
+    *
+  FROM '.CTDS_CONTRIB_TABLE.'
+  WHERE contrib_uuid = \''.$params['uuid'].'\'
+;';
+  $contribs = query2array($query);
+
+  if (count($contribs) == 0)
+  {
+    return new PwgError(WS_ERR_INVALID_PARAM, 'unknow uuid');
+  }
+
+  $contrib = $contribs[0];
+
+  list($dbnow) = pwg_db_fetch_row(pwg_query('SELECT NOW();'));
+
+  // we update the contribution but we don't remove the row from database
+  single_update(
+    CTDS_CONTRIB_TABLE,
+    array(
+      'state' => 'removed',
+      'removed_on' => $dbnow,
+      ),
+    array(
+      'image_idx' => $contrib['image_idx']
+      )
+    );
+
+  delete_elements(array($contrib['image_idx']), true);
+
+  invalidate_user_cache();
+
+  return array(
+    'uuid' => $params['uuid'],
+  );
+}
+
 function ctds_ws_photo_validate($params, &$service)
 {
   if (ctds_photo_validate($params['image_id']))

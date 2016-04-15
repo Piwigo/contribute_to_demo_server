@@ -75,6 +75,15 @@ function ctds_ws_add_methods($arr)
     );
 
   $service->addMethod(
+    'contrib.photo.remove',
+    'ctds_ws_photo_remove',
+    array(
+      'uuid' => array(),
+    ),
+    'Submit a photo to the Piwigo demo'
+  );
+
+  $service->addMethod(
     'contrib.photo.validate',
     'ctds_ws_photo_validate',
     array(
