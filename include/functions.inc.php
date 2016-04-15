@@ -251,6 +251,53 @@ SELECT *
       )
     );
 
+    // notify demo admins that a new photo is pending
+    include_once(PHPWG_ROOT_PATH.'include/functions_mail.inc.php');
+
+    $link = get_absolute_root_url().'admin.php?page=plugin-contribute_to_demo_server-pendings';
+
+    $conf['derivative_url_style'] = 2;
+
+    $thumb_url = DerivativeImage::thumb_url(
+      array(
+        'id' => $image['id'],
+        'path' => $image['path'],
+      )
+    );
+
+    $content = '<p style="text-align:center">';
+    $content.= 'New contribution from '.$params['piwigo_url'];
+    $content.= '<br><br><a href="'.$link.'">';
+    $content.= '<img src="'.$thumb_url.'">';
+    $content.= '</a>';
+
+    $subject = l10n('new contribution');
+
+    // get admin emails
+    $query = '
+  SELECT
+      u.'.$conf['user_fields']['email'].' AS email
+    FROM '.USERS_TABLE.' AS u
+      JOIN '.USER_INFOS_TABLE.' AS i ON i.user_id =  u.'.$conf['user_fields']['id'].'
+    WHERE i.status in (\'webmaster\',  \'admin\')
+      AND u.'.$conf['user_fields']['email'].' IS NOT NULL
+  ;';
+    $admin_emails = query2array($query, null, 'email');
+
+    foreach ($admin_emails as $to)
+    {
+      pwg_mail(
+        $to,
+        array(
+          'subject' => '['.$conf['gallery_title'].'] '.$subject,
+          'mail_title' => $conf['gallery_title'],
+          'mail_subtitle' => $subject,
+          'content' => $content,
+          'content_format' => 'text/html',
+          )
+        );
+    }
+
    return array(
      'uuid' => $uuid,
      );
