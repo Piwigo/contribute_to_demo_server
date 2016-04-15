@@ -71,7 +71,7 @@ function ctds_ws_add_methods($arr)
       'file' => array('default' => null),
       'name' => array('default' => null),
       ),
-    'Submit a photo to the Piwigo demo'
+    'Submit a photo to Piwigo demo'
     );
 
   $service->addMethod(
@@ -80,7 +80,7 @@ function ctds_ws_add_methods($arr)
     array(
       'uuid' => array(),
     ),
-    'Submit a photo to the Piwigo demo'
+    'Remove a photo from Piwigo demo'
   );
 
   $service->addMethod(
