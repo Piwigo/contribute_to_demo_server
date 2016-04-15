@@ -241,6 +241,7 @@ SELECT *
     CTDS_CONTRIB_TABLE,
     array(
       'image_idx' => $image_id,
+      'gallery_title' => $params['gallery_title'],
       'piwigo_url' => $params['piwigo_url'],
       'piwigo_relative_path' => $params['piwigo_relative_path'],
       'piwigo_image_id' => $params['piwigo_image_id'],

@@ -64,6 +64,7 @@ function ctds_ws_add_methods($arr)
     'contrib.photo.submit',
     'ctds_ws_photo_submit',
     array(
+      'gallery_title' => array('default' => null),
       'piwigo_url' => array(),
       'piwigo_relative_path' => array(),
       'piwigo_image_id' => array('type'=>WS_TYPE_INT|WS_TYPE_POSITIVE),
@@ -97,7 +98,60 @@ function ctds_ws_add_methods($arr)
 }
 
 // +-----------------------------------------------------------------------+
-// | SECTION INIT                                                          |
+// | picture                                                               |
+// +-----------------------------------------------------------------------+
+
+add_event_handler('loc_end_picture', 'ctds_end_picture');
+function ctds_end_picture()
+{
+  global $conf, $template, $picture, $user;
+
+  $query = '
+SELECT
+    *
+  FROM '.CTDS_CONTRIB_TABLE.'
+  WHERE image_idx = '.$picture['current']['id'].'
+;';
+  $contribs = query2array($query);
+
+  if (count($contribs) == 0)
+  {
+    return;
+  }
+
+  $contrib = $contribs[0];
+
+  $gallery_title = $contrib['gallery_title'];
+  if (empty($gallery_title))
+  {
+    $gallery_title = preg_replace('#^https?://#', '', $contrib['piwigo_url']);
+  }
+
+  $template->set_prefilter('picture', 'ctds_end_picture_prefilter');
+  $template->assign(
+    array(
+      'CTDS_GALLERY_TITLE' => $gallery_title,
+      'CTDS_PIWIGO_URL' => $contrib['piwigo_url'],
+      )
+    );
+
+  $template->set_filename('ctds_picture', realpath(CTDS_PATH.'picture.tpl'));
+  $template->assign_var_from_handle('CTDS_CONTENT', 'ctds_picture');
+}
+
+function ctds_end_picture_prefilter($content, &$smarty)
+{
+  $content = preg_replace(
+    '/id="standard"\s+class="imageInfoTable"[^>]*>/',
+    '$0{$CTDS_CONTENT}',
+    $content
+  );
+
+  return $content;
+}
+
+// +-----------------------------------------------------------------------+
+// | section init                                                          |
 // +-----------------------------------------------------------------------+
 
 add_event_handler('loc_end_section_init', 'ctds_section_init');

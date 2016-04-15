@@ -81,6 +81,7 @@ SELECT
     comment,
 
     image_idx,
+    gallery_title,
     piwigo_url,
     piwigo_relative_path,
     piwigo_image_id,
@@ -115,6 +116,12 @@ foreach ($rows as $row)
   $thumb_url = DerivativeImage::url(IMG_THUMB, $src_image);
   $zoom_url = DerivativeImage::url(IMG_LARGE, $src_image);
 
+  $gallery_title = $row['gallery_title'];
+  if (empty($gallery_title))
+  {
+    $gallery_title = preg_replace('#^https?://#', '', $row['piwigo_url']);
+  }
+
   $template->append(
     'photos',
     array(
@@ -128,6 +135,8 @@ foreach ($rows as $row)
       'FILE' => $row['file'],
       'DATE_CREATION' => empty($row['date_creation']) ? l10n('N/A') : format_date($row['date_creation']),
       'DESCRIPTION' => $row['comment'],
+      'PIWIGO_GALLERY_TITLE' => $gallery_title,
+      'PIWIGO_URL' => $row['piwigo_url'],
       )
     );
 }
