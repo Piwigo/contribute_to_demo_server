@@ -42,8 +42,30 @@ jQuery(document).ready(function(){
       },
       success:function(data) {
         var data = jQuery.parseJSON(data);
-        if (data.result === true) {
-          jQuery('#s'+imageId).fadeOut();
+        if (data.stat == 'ok') {
+          console.log("submission rejected, uuid="+data.result.contrib_uuid);
+
+          // sub AJAX request, this time we call the remote Piwigo
+          jQuery.ajax({
+            url: data.result.piwigo_url+"/ws.php?format=json&method=contrib.photo.rejected",
+            type:"POST",
+            data: {
+              uuid : data.result.contrib_uuid,
+            },
+            success:function(data) {
+              var data = jQuery.parseJSON(data);
+              if (data.stat == 'ok') {
+                console.log("contribution rejected");
+                jQuery('#s'+imageId).fadeOut();
+              }
+              else {
+                console.log("reject failed");
+              }
+            },
+            error:function(XMLHttpRequest, textStatus, errorThrows) {
+              alert("error calling remote reject");
+            }
+          });
         }
         else {
           alert('problem on reject');

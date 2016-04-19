@@ -364,9 +364,25 @@ function ctds_ws_photo_validate($params, &$service)
 
 function ctds_ws_photo_reject($params, &$service)
 {
+  // check the contrib exists
+  $query = '
+SELECT
+    *
+  FROM '.CTDS_CONTRIB_TABLE.'
+  WHERE image_idx = '.$params['image_id'].'
+;';
+  $contribs = query2array($query);
+
+  if (count($contribs) == 0)
+  {
+    return new PwgError(WS_ERR_INVALID_PARAM, 'Invalid image_id (not a contribution)');
+  }
+
+  $contrib = $contribs[0];
+
   if (ctds_photo_reject($params['image_id']))
   {
-    return true;
+    return $contrib;
   }
 
   return false;

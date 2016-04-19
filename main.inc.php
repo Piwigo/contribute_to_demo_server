@@ -87,7 +87,7 @@ function ctds_ws_add_methods($arr)
     'contrib.photo.validate',
     'ctds_ws_photo_validate',
     array(
-      'image_id' => array('type'=>WS_TYPE_INT|WS_TYPE_POSITIVE),
+      'image_id' => array('type'=>WS_TYPE_ID),
       ),
     'Validate a submitted photo',
     null,
@@ -98,7 +98,7 @@ function ctds_ws_add_methods($arr)
     'contrib.photo.reject',
     'ctds_ws_photo_reject',
     array(
-      'image_id' => array('type'=>WS_TYPE_INT|WS_TYPE_POSITIVE),
+      'image_id' => array('type'=>WS_TYPE_ID),
       ),
     'Reject a submitted photo',
     null,
