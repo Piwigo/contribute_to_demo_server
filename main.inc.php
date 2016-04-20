@@ -61,7 +61,7 @@ function ctds_ws_add_methods($arr)
   $service = &$arr[0];
 
   $service->addMethod(
-    'contrib.photo.submit',
+    'contrib_server.photo.submit',
     'ctds_ws_photo_submit',
     array(
       'gallery_title' => array('default' => null),
@@ -75,7 +75,7 @@ function ctds_ws_add_methods($arr)
     );
 
   $service->addMethod(
-    'contrib.photo.remove',
+    'contrib_server.photo.remove',
     'ctds_ws_photo_remove',
     array(
       'uuid' => array(),
@@ -84,7 +84,7 @@ function ctds_ws_add_methods($arr)
   );
 
   $service->addMethod(
-    'contrib.photo.validate',
+    'contrib_server.photo.validate',
     'ctds_ws_photo_validate',
     array(
       'image_id' => array('type'=>WS_TYPE_ID),
@@ -95,7 +95,7 @@ function ctds_ws_add_methods($arr)
     );
 
   $service->addMethod(
-    'contrib.photo.reject',
+    'contrib_server.photo.reject',
     'ctds_ws_photo_reject',
     array(
       'image_id' => array('type'=>WS_TYPE_ID),

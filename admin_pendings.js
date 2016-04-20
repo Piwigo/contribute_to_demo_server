@@ -5,7 +5,7 @@ jQuery(document).ready(function(){
     var imageId = jQuery(this).data('image_id');
 
     jQuery.ajax({
-      url: "ws.php?format=json&method=contrib.photo.validate",
+      url: "ws.php?format=json&method=contrib_server.photo.validate",
       type:"POST",
       data: {image_id:imageId},
       beforeSend: function() {
@@ -34,47 +34,23 @@ jQuery(document).ready(function(){
     var imageId = jQuery(this).data('image_id');
 
     jQuery.ajax({
-      url: "ws.php?format=json&method=contrib.photo.reject",
+      url: "ws.php?format=json&method=contrib_server.photo.reject",
       type:"POST",
-      data: {image_id:imageId},
-      beforeSend: function() {
-        jQuery('#s'+imageId+' .reject img.loading').show();
+      data: {
+        image_id : imageId,
       },
       success:function(data) {
         var data = jQuery.parseJSON(data);
         if (data.stat == 'ok') {
-          console.log("submission rejected, uuid="+data.result.contrib_uuid);
-
-          // sub AJAX request, this time we call the remote Piwigo
-          jQuery.ajax({
-            url: data.result.piwigo_url+"/ws.php?format=json&method=contrib.photo.rejected",
-            type:"POST",
-            data: {
-              uuid : data.result.contrib_uuid,
-            },
-            success:function(data) {
-              var data = jQuery.parseJSON(data);
-              if (data.stat == 'ok') {
-                console.log("contribution rejected");
-                jQuery('#s'+imageId).fadeOut();
-              }
-              else {
-                console.log("reject failed");
-              }
-            },
-            error:function(XMLHttpRequest, textStatus, errorThrows) {
-              alert("error calling remote reject");
-            }
-          });
+          console.log("contribution rejected");
+          jQuery('#s'+imageId).fadeOut();
         }
         else {
-          alert('problem on reject');
-          jQuery('#s'+imageId+' .reject img.loading').hide();
+          console.log("reject failed");
         }
       },
       error:function(XMLHttpRequest, textStatus, errorThrows) {
-        alert('problem on reject');
-        jQuery('#s'+imageId+' .reject img.loading').hide();
+        alert("error calling reject");
       }
     });
 

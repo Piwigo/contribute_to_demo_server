@@ -151,6 +151,27 @@ function ctds_photo_reject($image_id)
 
   invalidate_user_cache();
 
+  // notify the contributor Piwigo
+  $query = '
+SELECT
+    *
+  FROM '.CTDS_CONTRIB_TABLE.'
+  WHERE image_idx = '.$image_id.'
+;';
+  $contribs = query2array($query);
+  $contrib = $contribs[0];
+
+  $notify_url = $contrib['piwigo_url'].'/ws.php';
+
+  $get_params = array(
+    'format' => 'json',
+    'method' => 'contrib.photo.rejected',
+    'uuid' => $contrib['contrib_uuid'],
+  );
+
+  // fetchRemote($src, &$dest, $get_data=array(), $post_data=array()
+  fetchRemote($notify_url, $result, $get_params);
+
   // TODO send email to contributor
 
   return true;
