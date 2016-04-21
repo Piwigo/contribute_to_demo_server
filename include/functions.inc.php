@@ -185,6 +185,10 @@ function ctds_ws_photo_submit($params, &$service)
 {
   global $conf;
 
+  $upload_dir = $conf['upload_dir'].'/buffer';
+  $temp_filepath = $upload_dir.'/'.md5(generate_key(40)).'.'.get_extension($params['file']);
+  file_put_contents($temp_filepath, base64_decode($params['file_content']));
+
   $params = array_map('trim', $params);
 
   $params['piwigo_url'] = rtrim($params['piwigo_url'], '/');
@@ -197,41 +201,23 @@ function ctds_ws_photo_submit($params, &$service)
   {
     return new PwgError(WS_ERR_INVALID_PARAM, 'Invalid piwigo_url');
   }
+  
   // check file extension
   if (!in_array(strtolower(get_extension($params['piwigo_relative_path'])), $allowed_extensions))
   {
     return new PwgError(WS_ERR_INVALID_PARAM, 'Invalid file type');
   }
+  
   // download file
   include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
-
-  $upload_dir = $conf['upload_dir'].'/buffer';
-
-  // create the upload directory tree if not exists
-  if (!mkgetdir($upload_dir, MKGETDIR_DEFAULT&~MKGETDIR_DIE_ON_ERROR))
-  {
-    return new PwgError(500, 'error during buffer directory creation');
-  }
-
-  $piwigo_photo_url = $params['piwigo_url'].'/'.$params['piwigo_relative_path'];
-
-  $temp_filepath = $upload_dir.'/'.md5($piwigo_photo_url.time()).'.'.get_extension($piwigo_photo_url);
-  $file = fopen($temp_filepath, 'w+');
-  $result = fetchRemote($piwigo_photo_url, $file);
-  fclose($file);
-
-  // download failed ?
-  if (!$result)
-  {
-    @unlink($temp_filepath);
-    return new PwgError(WS_ERR_INVALID_PARAM, l10n('Unable to download file'));
-  }
+  
   // check mime-type
   if (!in_array(get_mime($temp_filepath, $allowed_mimes[0]), $allowed_mimes))
   {
     @unlink($temp_filepath);
     return new PwgError(WS_ERR_INVALID_PARAM, l10n('Invalid file type'));
   }
+  
   // add photo
   include_once(PHPWG_ROOT_PATH.'admin/include/functions_upload.inc.php');
 

@@ -70,6 +70,7 @@ function ctds_ws_add_methods($arr)
       'piwigo_image_id' => array('type'=>WS_TYPE_INT|WS_TYPE_POSITIVE),
       'file' => array('default' => null),
       'name' => array('default' => null),
+      'file_content' => array('default' => null),
       ),
     'Submit a photo to Piwigo demo'
     );
