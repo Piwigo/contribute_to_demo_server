@@ -4,18 +4,10 @@
 {combine_script id='ctds_pendings' load='footer' require='jquery' path='plugins/contribute_to_demo_server/admin_pendings.js'}
 
 {html_style}{literal}
-.rowSelected {background-color:#C2F5C2 !important}
 .comment p {text-align:left; margin:5px 0 0 5px}
-.comment table {margin:5px 0 0 0}
+.comment table {margin:5px 0 0 0; text-align:left;}
 .comment table th {padding-right:10px}
 .checkPhoto img.loading {display:none}
-
-.state_not_reviewed {color:#ff7700}
-.state_to_validate {color:green}
-.state_quarantine {color:red}
-
-.showcaseFilter {text-align:left;margin:5px;}
-.showcaseFilter .navigationBar {float:right; margin:0;}
 {/literal}{/html_style}
 
 <div class="titrePage">
@@ -56,6 +48,10 @@
       <tr>
         <th>{'Created on'|@translate}</th>
         <td>{$photo.DATE_CREATION}</td>
+      </tr>
+      <tr>
+        <th>{'Dimensions'|@translate}</th>
+        <td>{$photo.DIMENSIONS}</td>
       </tr>
     </table>
   </div>

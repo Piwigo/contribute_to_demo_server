@@ -79,6 +79,10 @@ SELECT
     author,
     file,
     comment,
+    width,
+    height,
+    filesize,
+    rotation,
 
     image_idx,
     gallery_title,
@@ -122,6 +126,8 @@ foreach ($rows as $row)
     $gallery_title = preg_replace('#^https?://#', '', $row['piwigo_url']);
   }
 
+  $dimensions = $row['width'].'x'.$row['height'].' '.l10n('pixels').', '.sprintf(l10n('%d Kb'), $row['filesize']);
+
   $template->append(
     'photos',
     array(
@@ -133,6 +139,7 @@ foreach ($rows as $row)
       'ADDED_ON' => format_date($row['date_available'], true),
       'NAME' => $row['name'],
       'FILE' => $row['file'],
+      'DIMENSIONS' => $dimensions,
       'DATE_CREATION' => empty($row['date_creation']) ? l10n('N/A') : format_date($row['date_creation']),
       'DESCRIPTION' => $row['comment'],
       'PIWIGO_GALLERY_TITLE' => $gallery_title,
