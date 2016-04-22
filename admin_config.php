@@ -2,7 +2,7 @@
 // +-----------------------------------------------------------------------+
 // | Piwigo - a PHP based picture gallery                                  |
 // +-----------------------------------------------------------------------+
-// | Copyright(C) 2008-2015 Piwigo Team                  http://piwigo.org |
+// | Copyright(C) 2008-2011 Piwigo Team                  http://piwigo.org |
 // | Copyright(C) 2003-2008 PhpWebGallery Team    http://phpwebgallery.net |
 // | Copyright(C) 2002-2003 Pierrick LE GALL   http://le-gall.net/pierrick |
 // +-----------------------------------------------------------------------+
@@ -27,9 +27,7 @@ if( !defined("PHPWG_ROOT_PATH") )
 }
 
 include_once(PHPWG_ROOT_PATH.'admin/include/functions.php');
-include_once(PHPWG_ROOT_PATH.'admin/include/tabsheet.class.php');
-
-define('CTDS_BASE_URL', get_root_url().'admin.php?page=plugin-contribute_to_demo_server');
+include_once(PHPWG_ROOT_PATH.'include/functions_picture.inc.php');
 
 // +-----------------------------------------------------------------------+
 // | Check Access and exit when user status is not ok                      |
@@ -38,55 +36,69 @@ define('CTDS_BASE_URL', get_root_url().'admin.php?page=plugin-contribute_to_demo
 check_status(ACCESS_ADMINISTRATOR);
 
 // +-----------------------------------------------------------------------+
-// | Tabs                                                                  |
+// | form submission                                                       |
 // +-----------------------------------------------------------------------+
 
-$pendings_label = l10n('Pending Photos');
-if (count($page['ctds_pendings']) > 0)
+if (!empty($_POST))
 {
-  $pendings_label.= ' ('.count($page['ctds_pendings']).')';
+  check_input_parameter('groups', $_POST, true, PATTERN_ID);
+
+  // first we must reset all groups to false
+  $query = '
+UPDATE '.GROUPS_TABLE.'
+  SET ctds_notify = \'false\'
+;';
+  pwg_query($query);
+
+  // then we set submitted groups to true
+  if (isset($_POST['groups']) and count($_POST['groups']) > 0)
+  {
+    $query = '
+UPDATE '.GROUPS_TABLE.'
+  SET ctds_notify = \'true\'
+  WHERE id IN ('.implode(',', $_POST['groups']).')
+;';
+    pwg_query($query);
+  }
+  
+  array_push($page['infos'], l10n('Information data registered in database'));
 }
 
-$tabs = array(
+// +-----------------------------------------------------------------------+
+// | template init                                                         |
+// +-----------------------------------------------------------------------+
+
+$template->set_filename('plugin_admin_content', dirname(__FILE__).'/admin_config.tpl');
+
+// +-----------------------------------------------------------------------+
+// | form options                                                          |
+// +-----------------------------------------------------------------------+
+
+// groups
+$query = '
+SELECT id
+  FROM '.GROUPS_TABLE.'
+;';
+$group_ids = query2array($query, null, 'id');
+
+$query = '
+SELECT id
+  FROM '.GROUPS_TABLE.'
+  WHERE ctds_notify = \'true\'
+;';
+$groups_selected = query2array($query, null, 'id');
+
+$template->assign(
   array(
-    'code' => 'pendings',
-    'label' => $pendings_label,
-    ),
-  array(
-    'code' => 'config',
-    'label' => l10n('Configuration'),
-    ),
+    'CACHE_KEYS' => get_admin_client_cache_keys(array('groups')),
+    'groups' => $group_ids,
+    'groups_selected' => $groups_selected,
+    )
   );
 
-$tab_codes = array_map(
-  create_function('$a', 'return $a["code"];'),
-  $tabs
-  );
-
-if (isset($_GET['tab']) and in_array($_GET['tab'], $tab_codes))
-{
-  $page['tab'] = $_GET['tab'];
-}
-else
-{
-  $page['tab'] = $tabs[0]['code'];
-}
-
-$tabsheet = new tabsheet();
-foreach ($tabs as $tab)
-{
-  $tabsheet->add(
-    $tab['code'],
-    $tab['label'],
-    CTDS_BASE_URL.'-'.$tab['code']
-    );
-}
-$tabsheet->select($page['tab']);
-$tabsheet->assign();
-
 // +-----------------------------------------------------------------------+
-// |                             Load the tab                              |
+// | sending html code                                                     |
 // +-----------------------------------------------------------------------+
 
-include(CTDS_PATH.'admin_'.$page['tab'].'.php');
+$template->assign_var_from_handle('ADMIN_CONTENT', 'plugin_admin_content');
 ?>

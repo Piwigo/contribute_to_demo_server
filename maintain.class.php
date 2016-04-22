@@ -32,6 +32,12 @@ CREATE TABLE IF NOT EXISTS '.$prefixeTable.'contribs (
 ;';
     pwg_query($query);
 
+    $result = pwg_query('SHOW COLUMNS FROM `'.GROUPS_TABLE.'` LIKE "ctds_notify";');
+    if (!pwg_db_num_rows($result))
+    {
+      pwg_query('ALTER TABLE '.GROUPS_TABLE.' ADD ctds_notify enum(\'true\', \'false\') DEFAULT \'false\';');
+    }
+
     $this->installed = true;
   }
 
@@ -60,6 +66,9 @@ CREATE TABLE IF NOT EXISTS '.$prefixeTable.'contribs (
     global $prefixeTable;
 
     $query = 'DROP TABLE '.$prefixeTable.'contribs;';
+    pwg_query($query);
+
+    $query = 'ALTER TABLE '.GROUPS_TABLE.' DROP COLUMN ctds_notify;';
     pwg_query($query);
   }
 }

@@ -280,18 +280,18 @@ SELECT *
 
     $subject = l10n('new contribution');
 
-    // get admin emails
+    // get emails to notify
     $query = '
-  SELECT
-      u.'.$conf['user_fields']['email'].' AS email
-    FROM '.USERS_TABLE.' AS u
-      JOIN '.USER_INFOS_TABLE.' AS i ON i.user_id =  u.'.$conf['user_fields']['id'].'
-    WHERE i.status in (\'webmaster\',  \'admin\')
-      AND u.'.$conf['user_fields']['email'].' IS NOT NULL
-  ;';
-    $admin_emails = query2array($query, null, 'email');
+SELECT
+    DISTINCT(u.'.$conf['user_fields']['email'].') AS email
+  FROM '.USERS_TABLE.' AS u
+    JOIN '.USER_GROUP_TABLE.' AS ug ON ug.user_id = u.'.$conf['user_fields']['id'].'
+    JOIN '.GROUPS_TABLE.' AS g ON g.id = ug.group_id
+  WHERE ctds_notify = \'true\'
+;';
+    $emails = query2array($query, null, 'email');
 
-    foreach ($admin_emails as $to)
+    foreach ($emails as $to)
     {
       pwg_mail(
         $to,
