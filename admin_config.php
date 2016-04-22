@@ -60,6 +60,16 @@ UPDATE '.GROUPS_TABLE.'
 ;';
     pwg_query($query);
   }
+
+  check_input_parameter('destination', $_POST, false, PATTERN_ID);
+
+  $conf['contrib_server']['destination'] = null;
+  if (!empty($_POST['destination']))
+  {
+    $conf['contrib_server']['destination'] = $_POST['destination'];
+  }
+  
+  conf_update_param('contrib_server', $conf['contrib_server'], true);
   
   array_push($page['infos'], l10n('Information data registered in database'));
 }
@@ -90,9 +100,10 @@ $groups_selected = query2array($query, null, 'id');
 
 $template->assign(
   array(
-    'CACHE_KEYS' => get_admin_client_cache_keys(array('groups')),
+    'CACHE_KEYS' => get_admin_client_cache_keys(array('groups', 'categories')),
     'groups' => $group_ids,
     'groups_selected' => $groups_selected,
+    'destination' => array($conf['contrib_server']['destination']),
     )
   );
 

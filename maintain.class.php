@@ -70,6 +70,9 @@ CREATE TABLE IF NOT EXISTS '.$prefixeTable.'contribs (
 
     $query = 'ALTER TABLE '.GROUPS_TABLE.' DROP COLUMN ctds_notify;';
     pwg_query($query);
+
+    // delete configuration
+    conf_delete_param('contrib_server');
   }
 }
 ?>

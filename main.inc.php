@@ -24,6 +24,20 @@ include_once(CTDS_PATH.'include/functions.inc.php');
 // | Add event handlers                                                    |
 // +-----------------------------------------------------------------------+
 
+add_event_handler('init', 'ctds_init');
+function ctds_init()
+{
+  global $conf;
+  
+  // prepare plugin configuration
+  if (!isset($conf['contrib_server']))
+  {
+    $conf['contrib_server'] = array('destination' => null);
+  }
+  
+  $conf['contrib_server'] = safe_unserialize($conf['contrib_server']);
+}
+
 add_event_handler('get_admin_plugin_menu_links', 'ctds_admin_menu');
 function ctds_admin_menu($menu)
 {

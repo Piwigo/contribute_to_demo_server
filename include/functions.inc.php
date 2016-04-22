@@ -224,7 +224,7 @@ function ctds_ws_photo_submit($params, &$service)
   $image_id = add_uploaded_file(
     $temp_filepath,
     $params['file'],
-    array(1), // TODO make this configurable
+    array($conf['contrib_server']['destination']),
     16 // level -> moderation pending
     );
 

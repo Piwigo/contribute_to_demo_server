@@ -24,9 +24,17 @@ var groupsCache = new GroupsCache({
   rootUrl: '{$ROOT_URL}'
 });
 
+{* <!-- CATEGORIES --> *}
+var categoriesCache = new CategoriesCache({
+  serverKey: '{$CACHE_KEYS.categories}',
+  serverId: '{$CACHE_KEYS._hash}',
+  rootUrl: '{$ROOT_URL}'
+});
+
 {literal}
 jQuery(document).ready(function() {
   groupsCache.selectize(jQuery('[data-selectize=groups]'));
+  categoriesCache.selectize(jQuery('[data-selectize=categories]'));
 });
 {/literal}{/footer_script}
 
@@ -34,18 +42,23 @@ jQuery(document).ready(function() {
   <h2>{'Configuration'|@translate} - Contribute to Demo [server]</h2>
 </div>
 
-<fieldset>
-  <legend>{'Notification'|translate}</legend>
-
 <form method="post" action="{$F_ACTION}">
 
   <p>
+    <strong>{'Destination album for contributions'|@translate}</strong>
+    <br>
+    <select data-selectize="categories" data-value="{$destination|@json_encode|escape:html}"
+      placeholder="{'Type in a search term'|translate}"
+      name="destination" style="width:600px;"></select>
+  </p>
+
+  <p>
 {if count($groups) > 0}
-    <strong>{'Notify groups on new photos'|@translate}</strong>
+    <strong>{'Notify group'|@translate}</strong>
     <br>
     <select data-selectize="groups" data-value="{$groups_selected|@json_encode|escape:html}"
       placeholder="{'Type in a search term'|translate}"
-      name="groups[]" multiple style="width:600px;"></select>
+      name="groups[]" style="width:600px;"></select>
 {else}
     {'There is no group in this gallery.'|@translate} <a href="admin.php?page=group_list" class="externalLink">{'Group management'|@translate}</a>
 {/if}
@@ -58,5 +71,3 @@ jQuery(document).ready(function() {
 {/if}
 
 </form>
-
-</fieldset>
