@@ -85,6 +85,7 @@ function ctds_ws_add_methods($arr)
       'file' => array('default' => null),
       'name' => array('default' => null),
       'file_content' => array('default' => null),
+      'email' => array('default' => null),
       ),
     'Submit a photo to Piwigo demo'
     );

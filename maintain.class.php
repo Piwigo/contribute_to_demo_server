@@ -18,6 +18,7 @@ class contribute_to_demo_server_maintain extends PluginMaintain
 CREATE TABLE IF NOT EXISTS '.$prefixeTable.'contribs (
   image_idx int(11) NOT NULL,
   gallery_title varchar(255),
+  email varchar(255),
   piwigo_url varchar(255) NOT NULL,
   piwigo_relative_path varchar(255) NOT NULL,
   piwigo_image_id int(11) NOT NULL,
@@ -32,6 +33,12 @@ CREATE TABLE IF NOT EXISTS '.$prefixeTable.'contribs (
 ;';
     pwg_query($query);
 
+    $result = pwg_query('SHOW COLUMNS FROM `'.$prefixeTable.'contribs` LIKE "email";');
+    if (!pwg_db_num_rows($result))
+    {
+      pwg_query('ALTER TABLE '.$prefixeTable.'contribs ADD email varchar(255) DEFAULT NULL;');
+    }
+    
     $result = pwg_query('SHOW COLUMNS FROM `'.GROUPS_TABLE.'` LIKE "ctds_notify";');
     if (!pwg_db_num_rows($result))
     {

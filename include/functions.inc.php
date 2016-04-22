@@ -102,8 +102,6 @@ function ctds_photo_validate($image_id)
 
   invalidate_user_cache();
 
-  // TODO send email to contributor
-
   // notify the contributor Piwigo
   $query = '
 SELECT
@@ -124,6 +122,47 @@ SELECT
 
   // fetchRemote($src, &$dest, $get_data=array(), $post_data=array()
   fetchRemote($notify_url, $result, $get_params);
+
+  // notify contributor by mail
+  if (email_check_format($contrib['email']))
+  {
+    $query = '
+SELECT
+    *
+  FROM '.IMAGES_TABLE.'
+  WHERE id = '.$image_id.'
+;';
+    $images = query2array($query);
+    $image = $images[0];
+
+    include_once(PHPWG_ROOT_PATH.'include/functions_mail.inc.php');
+
+    $link = make_picture_url(array('image_id' => $image_id));
+
+    $conf['derivative_url_style'] = 2;
+
+    $src_image = new SrcImage($image);
+    $image_url = DerivativeImage::url(IMG_SMALL, $src_image);
+
+    $content = '<p style="text-align:center">';
+    $content.= 'Your photo has been added. Thanks for your contribution!';
+    $content.= '<br><br><a href="'.$link.'">';
+    $content.= '<img src="'.$image_url.'">';
+    $content.= '</a>';
+
+    $subject = l10n('Contribution validated :-)');
+
+    pwg_mail(
+      $contrib['email'],
+      array(
+        'subject' => '['.$conf['gallery_title'].'] '.$subject,
+        'mail_title' => $subject,
+        'mail_subtitle' => '',
+        'content' => $content,
+        'content_format' => 'text/html',
+        )
+      );
+  }
 
   return true;
 }
