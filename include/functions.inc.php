@@ -294,6 +294,7 @@ SELECT *
       'contrib_uuid' => $uuid,
       'state' => 'submitted',
       'submitted_on' => $image['date_available'],
+      'email' => $params['email'],
       )
     );
 
