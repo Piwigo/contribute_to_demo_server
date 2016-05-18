@@ -89,6 +89,7 @@ SELECT
     piwigo_url,
     piwigo_relative_path,
     piwigo_image_id,
+    email,
     contrib_uuid
 
   FROM '.IMAGES_TABLE.'
@@ -144,6 +145,7 @@ foreach ($rows as $row)
       'DESCRIPTION' => $row['comment'],
       'PIWIGO_GALLERY_TITLE' => $gallery_title,
       'PIWIGO_URL' => $row['piwigo_url'],
+      'CONTRIBUTOR_EMAIL' => $row['email'],
       )
     );
 }

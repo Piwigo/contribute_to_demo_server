@@ -39,7 +39,7 @@
     <td>
   <div class="comment">
     <p class="commentAction" style="float:left;margin:0.5em 0 0 0.5em"><a href="{$photo.ZOOM_SRC}" class="zoom" title="{$photo.NAME|escape:html}">{'Zoom'|@translate}</a> &middot; <a href="{$photo.U_EDIT}">{'Edit'|@translate}</a></p>
-    <p class="commentHeader"><strong><a href="{$photo.PIWIGO_URL}" target="_blank">{$photo.PIWIGO_GALLERY_TITLE}</a></strong> - <em>{$photo.ADDED_ON}</em></p>
+    <p class="commentHeader"><strong><a href="{$photo.PIWIGO_URL}" target="_blank">{$photo.PIWIGO_GALLERY_TITLE}</a></strong> - <a class="icon-mail-alt" href="mailto:{$CONTRIBUTOR_EMAIL}"></a> - <em>{$photo.ADDED_ON}</em></p>
     <table>
       <tr>
         <th>{'Name'|@translate}</th>
